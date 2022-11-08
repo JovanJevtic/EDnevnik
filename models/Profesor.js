@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const ProfesorSchema = mongoose.Schema({
-  name: {
+  ime: {
     type: String,
     required: true
   },
@@ -17,7 +17,11 @@ const ProfesorSchema = mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: "Predmet"
   },
-  sifraProfesora: {
+  sifra: {
+    type: String,
+    required: true
+  },
+  email: {
     type: String,
     required: true
   }
