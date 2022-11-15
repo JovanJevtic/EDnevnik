@@ -6,11 +6,7 @@ const { validateProfesorInput } = require('../middlewares/validateProfesorInput'
 
 const { registerProfesor, loginProfesor, getProfesor, updateProfesor, getMe } = require('../controllers/profesorController');
 
-router.get('/', (req, res) => {
-  console.log('dasjdaskjk')
-  res.send('ello')
-})
-router.post('/', validateProfesorInput, registerProfesor);
+router.post('/', registerProfesor);
 router.post('/login', loginProfesor);
 router.get('/me', protect, getMe);
 router.put('/update/:id', protect, updateProfesor);

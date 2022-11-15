@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const PredmetSchema = mongoose.Schema({
-  name: {
+  ime: {
     type: String,
     required: true
   },
