@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const UcenikSchema = mongoose.Schema({
-  name: {
+  jbmg: {
+    type: String,
+    required: true
+  },
+  ime: {
     type: String,
     required: true
   },
