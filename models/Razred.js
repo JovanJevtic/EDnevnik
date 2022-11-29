@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const RazredSchema = mongoose.Schema({
-  name: {
+  ime: {
     type: String,
     required: true
   },
@@ -16,6 +16,10 @@ const RazredSchema = mongoose.Schema({
   predmeti: [{
     type: mongoose.Types.ObjectId,
     ref: 'Predmet'
+  }],
+  ucenici: [{
+    type: mongoose.Types.ObjectId,
+    ref: 'Ucenik'
   }]
 })
 

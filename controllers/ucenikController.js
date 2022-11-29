@@ -57,19 +57,20 @@ const registerUcenik = asyncHandler(async (req, res) => {
 //? Desc: Get ucenik by jbmg
 //* Route: POST api/ucenik/:jbmg
 //! Access: Public
-const getUserByJbmg = asyncHandler( async (req, res) => {
-  const ucenik = await Ucenik.findOne(req.params.jbmg);
+const getUserByJbmg = asyncHandler(async (req, res) => {
+  const ucenik = await Ucenik.findById(req.params.id);
 
   if (!ucenik) {
-    res.status(404).json({ message: 'Nepostojeci ucenik' })
+    res.status(404);
+    throw new Error("Nepostojeci ucenik");
   }
 
-  res.status(200).json({ 
+  res.status(200).json({
     ime: ucenik.name,
     prezime: ucenik.email,
     imeRoditelja: ucenik.imeRoditelja,
     datumRodjenja: ucenik.datumRodjenja,
-    razredId: ucenik.razredId 
+    razredId: ucenik.razredId
   });
 });
 
