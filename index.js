@@ -1,20 +1,28 @@
 const express = require('express');
 require('dotenv').config();
 const connectDB = require('./config/db');
+const cors = require('cors');
 
 const { errorHandler } = require('./middlewares/errorMiddleware');
 
 connectDB();
 
 const app = express();
-const PORT = process.env.PORT || 5300;
+const PORT = process.env.PORT || 5000;
+
+const allowedOrigins = ['http://localhost:5500', 'http://localhost:5000', 'http://localhost:3000'];
+app.use(cors({
+    origin: allowedOrigins
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use('/api/predmet', require('./routes/predmetRoute.js')); 
+app.use('/api/admin', require('./routes/adminRoutes')); 
+
 app.use('/api/ucenik', require('./routes/ucenikRoute.js'));
 app.use('/api/profesor', require('./routes/profesorRoute.js'));
-app.use('/api/predmet', require('./routes/predmetRoute.js'));
 app.use('/api/razred', require('./routes/razredRoute.js'));
 
 app.use(errorHandler);

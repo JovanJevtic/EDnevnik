@@ -21,6 +21,8 @@ const RazredSchema = mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'Ucenik'
   }]
+}, {
+  timestamps: true
 })
 
 module.exports = mongoose.model('Razred', RazredSchema);

@@ -21,14 +21,20 @@ const UcenikSchema = mongoose.Schema({
     type: Date,
     required: true
   },
-  sifraRoditelja: {
+  sifra: {
     type: String,
     required: true
   },
   razredId: {
     type: mongoose.Types.ObjectId,
     ref: "Razred"
+  },
+  email: {
+    type: String, 
+    required: true
   }
-})
+}, {
+  timestamps: true
+});
 
 module.exports = mongoose.model('Ucenik', UcenikSchema);

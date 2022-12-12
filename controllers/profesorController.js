@@ -2,9 +2,11 @@ const Profesor = require('../models/Profesor');
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
+const generator = require('generate-password')
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, 'process.env.JWT_SECRET', {
+  return jwt.sign({ id }, process.env.JWT_SECRET_PROF, {
     expiresIn: '30d',
   })
 }
@@ -13,43 +15,78 @@ const generateToken = (id) => {
 //* Route: POST api/users/register
 //! Access: Public
 const registerProfesor = asyncHandler(async (req, res) => {
-  const { ime, prezime, isRazrednik, predmet, sifra, email } = req.body;
+  const { ime, prezime, isRazrednik, predmet, email } = req.body;
 
-  if (!ime || !email || !sifra || !prezime || !isRazrednik || !predmet) {
+  if (!ime || !prezime || !email  || !isRazrednik || !predmet) {
     res.status(400)
     throw new Error('Sva polja su obavezna!');
   }
 
   //* Check if user is already existing
-  const profesorExists = await Profesor.findOne({ email });
+  const profesorExists = await Profesor.findOne({ $or: [{email: email}] });
   if (profesorExists) {
     res.status(400);
     throw new Error('Profesor sa ovim emailom vec postoji');
   }
 
+  //* Generate Password
+  const sifra = generator.generate({
+    length: 10,
+	  numbers: true
+  })
+
   //* Password hash
   const salt = await bcrypt.genSalt(10);
   const hashedPwd = await bcrypt.hash(sifra, salt);
 
-  //* Create a user
-  const profesor = await Profesor.create({
-    ime,
-    prezime,
-    email,
-    sifra: hashedPwd,
-    predmet,
-    isRazrednik
-  });
+  try {
+    //* Create a user
+    const profesor = await Profesor.create({
+      ime,
+      prezime,
+      email,
+      sifra: hashedPwd,
+      predmet,
+      isRazrednik
+    });
 
-  res.status(201).json({
-    _id: profesor._id,
-    ime: profesor.ime,
-    email: profesor.email,
-    prezime: profesor.prezime,
-    predmet: profesor.predmet,
-    isRazrednik: profesor.isRazrednik,
-    token: generateToken(profesor._id)
-  });
+    if (profesor) {
+      const transporter = nodemailer.createTransport({ 
+        service: 'gmail',
+        auth: { 
+            user: process.env.NODEMAILER_AUTH_EMAIL, 
+            pass: process.env.NODEMAILER_AUTH_PWD
+        } 
+      });
+
+      const mailOptions = { 
+          from: process.env.NODEMAILER_AUTH_EMAIL, 
+          to: email,     
+          subject: 'Account Verification Code', 
+          html: 'Zdravo,  '+ ime +',\n\n' + 'Vasa lozinka za prijavu je: ' + sifra  + '\n\n, Hvala!\n' 
+      };
+
+      try {
+          const sendResult = await transporter.sendMail(mailOptions);
+      } catch (error) {
+          res.status(400);
+          throw new Error(error);
+      }
+    }
+
+    res.status(201).json({
+      _id: profesor._id,
+      ime: profesor.ime,
+      prezime: profesor.prezime,
+      email: profesor.email,
+      predmet: profesor.predmet,
+      isRazrednik: profesor.isRazrednik,
+      token: generateToken(profesor._id)
+    });    
+  } catch (error) {
+    res.status(400);
+    throw new Error("Error while creating Profesor");
+  }
 });
 
 //? Desc: Logging a user
@@ -61,7 +98,7 @@ const loginProfesor = asyncHandler(async (req, res) => {
   //* Check for user email
   const profesor = await Profesor.findOne({ email })
 
-  if (profesor && (await bcrypt.compare(sifra, profesor.password))) {
+  if (profesor && (await bcrypt.compare(sifra, profesor.sifra))) {
     res.json({
       _id: profesor._id,
       ime: profesor.ime,
@@ -98,7 +135,7 @@ const getProfesor = asyncHandler(async (req, res) => {
     res.status(404).json({ message: 'Nepostojeci profesor' })
   }
 
-  res.status(200).json({ ime: profesor.name, email: profesor.email })
+  res.status(200).json({ ime: profesor.ime, email: profesor.email })
 });
 
 //? Desc: Update currently logged in user
@@ -119,7 +156,7 @@ const updateProfesor = asyncHandler(async (req, res) => {
 
     res.status(200).json({
       _id: newUser._id,
-      name: newUser.name,
+      ime: newUser.ime,
       email: newUser.email,
       customerId: newUser.customerId
     });

@@ -2,9 +2,11 @@ const Ucenik = require('../models/Ucenik');
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcryptjs');
+const generator = require('generate-password');
+const nodemailer = require('nodemailer');
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, 'process.env.JWT_SECRET', {
+  return jwt.sign({ id }, process.env.JWT_SECRET_UCENIK, {
     expiresIn: '30d',
   })
 }
@@ -13,9 +15,9 @@ const generateToken = (id) => {
 //* Route: POST api/users/register
 //! Access: Public
 const registerUcenik = asyncHandler(async (req, res) => {
-  const { jbmg, ime, prezime, datumRodjenja, imeRoditelja, razredId } = req.body;
+  const { jbmg, ime, prezime, datumRodjenja, imeRoditelja, razredId, email } = req.body;
 
-  if (!jbmg || !ime || !prezime || !datumRodjenja || !imeRoditelja || !razredId) {
+  if (!jbmg || !ime || !prezime || !datumRodjenja || !imeRoditelja || !razredId || !email) {
     res.status(400)
     throw new Error('Sva polja su obavezna!');
   }
@@ -27,31 +29,70 @@ const registerUcenik = asyncHandler(async (req, res) => {
     throw new Error('Ucenik sa ovim JBMG-om vec postoji');
   }
 
+  //* Generate Password
+  const sifra = generator.generate({
+    length: 10,
+	  numbers: true
+  })
+
   //* Password hash
   const salt = await bcrypt.genSalt(10);
   const hashedPwd = await bcrypt.hash(sifra, salt);
 
-  //* Create a user
-  const ucenik = await Profesor.create({
-    ime,
-    prezime,
-    jbmg,
-    sifraRoditelja: hashedPwd,
-    razredId,
-    imeRoditelja,
-    datumRodjenja
-  });
+  try {
+    //* Create a ucenik
+    const ucenik = await Ucenik.create({
+      ime,
+      prezime,
+      jbmg,
+      sifra: hashedPwd,
+      razredId,
+      imeRoditelja,
+      datumRodjenja,
+      email
+    });
 
-  res.status(201).json({
-    _id: ucenik._id,
-    ime: ucenik.ime,
-    jbmg: ucenik.email,
-    prezime: ucenik.prezime,
-    imeRoditelja: ucenik.imeRoditelja,
-    razredId: ucenik.razredId,
-    datumRodjenja: ucenik.datumRodjenja,
-    token: generateToken(ucenik._id)
-  });
+    if (ucenik) {
+      const transporter = nodemailer.createTransport({ 
+        service: 'gmail',
+        auth: { 
+            user: process.env.NODEMAILER_AUTH_EMAIL, 
+            pass: process.env.NODEMAILER_AUTH_PWD
+        } 
+      });
+
+      const mailOptions = { 
+          from: process.env.NODEMAILER_AUTH_EMAIL, 
+          to: email,     
+          subject: 'Account Verification Code', 
+          html: 'Zdravo,  '+ ime +',\n\n' + 'Vasa lozinka za prijavu je: ' + sifra  + '\n\n, Hvala!\n' 
+      };
+
+      try {
+          const sendResult = await transporter.sendMail(mailOptions);
+      } catch (error) {
+          res.status(400);
+          throw new Error(error);
+      }
+    }
+
+    
+    res.status(201).json({
+      _id: ucenik._id,
+      jbmg: ucenik.email,
+      email: ucenik.email,
+      ime: ucenik.ime,
+      prezime: ucenik.prezime,
+      imeRoditelja: ucenik.imeRoditelja,
+      razredId: ucenik.razredId,
+      datumRodjenja: ucenik.datumRodjenja,
+      token: generateToken(ucenik._id)
+    });    
+  } catch (error) {
+    res.status(400);
+    throw new Error(error);
+    throw new Error("Greska pri kreiranju ucenika!");
+  }
 });
 
 //? Desc: Get ucenik by jbmg

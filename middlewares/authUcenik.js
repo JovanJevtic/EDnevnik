@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const Ucenik = require('../models/Ucenik');
 
-const protect = asyncHandler(async (req, res, next) => {
+const protectUcenik = asyncHandler(async (req, res, next) => {
   let token;
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -11,7 +11,7 @@ const protect = asyncHandler(async (req, res, next) => {
       token = req.headers.authorization.split(' ')[1]
 
       // Verify token
-      const decoded = jwt.verify(token, 'process.env.JWT_SECRET')
+      const decoded = jwt.verify(token, process.env.JWT_SECRET_UCENIK)
 
       // Get profesor from the token
       req.ucenik = await Ucenik.findById(decoded.id).select('-password')
@@ -28,4 +28,4 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 });
 
-module.exports = { protect }; +
+module.exports = { protectUcenik }; 

@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const asyncHandler = require('express-async-handler');
+const { protectAdmin } = require('../middlewares/authAdmin');
 
 const Razred = require('../models/Razred');
 
-router.get('/:ime', async (req, res) => {
+router.get('/:ime', asyncHandler(async (req, res) => {
   const razred = await Razred.findOne(req.params.ime);
 
   if (!razred) {
@@ -11,12 +13,12 @@ router.get('/:ime', async (req, res) => {
   }
 
   res.status(200).json({ razred: razred })
-});
+}));
 
-router.post('/', async (req, res) => {
+router.post('/', protectAdmin,  asyncHandler( async (req, res) => {
   const { ime, smjer, razrednik, predmeti, ucenici } = req.body;
 
-  if (!ime || !smjer || !razrednik || !predmeti || !ucenici) {
+  if (!ime || !smjer || !razrednik || !predmeti) {
     res.status(400)
     throw new Error('Sva polja su obavezna')
   }
@@ -42,6 +44,6 @@ router.post('/', async (req, res) => {
   } catch (err) {
     res.status(400).json({ err: err });
   }
-});
+}));
 
 module.exports = router;
