@@ -20,6 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/predmet', require('./routes/predmetRoute.js')); 
 app.use('/api/admin', require('./routes/adminRoutes')); 
+app.use('/api/ocjena', require('./routes/ocjenaRoute'));
 
 app.use('/api/ucenik', require('./routes/ucenikRoute.js'));
 app.use('/api/profesor', require('./routes/profesorRoute.js'));
