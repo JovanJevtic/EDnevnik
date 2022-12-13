@@ -9,13 +9,8 @@ const OcjenaSchema = mongoose.Schema({
   ucenik: {
     type: mongoose.Types.ObjectId,
     ref: 'Ucenik',
-    unique: true
-  },
-  profesor: {
-    type: mongoose.Types.ObjectId,
-    ref: 'Profesor',
-    unique: true
-  },
+    required: true
+  },    
   date: {
     type: Date,
     default: Date.now()
@@ -29,6 +24,10 @@ const OcjenaSchema = mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'Predmet',
     required: true
+  },
+  profesor: {
+    type: mongoose.Types.ObjectId,
+    ref: 'Profesor',
   }
 }, {
   timestamps: true
