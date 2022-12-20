@@ -50,7 +50,7 @@ const register = asyncHandler(async (req, res) => {
           }
       } else {
         res.status(400);
-        throw new Error('Nevazeca lozinka, pristup odbijen!');
+        throw new Error('Nevazeca admin lozinka, pristup odbijen!');
       }
 
   });

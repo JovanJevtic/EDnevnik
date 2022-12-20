@@ -17,7 +17,10 @@ const generateToken = (id) => {
 const registerProfesor = asyncHandler(async (req, res) => {
   const { ime, prezime, isRazrednik, predmet, email } = req.body;
 
+  console.log(req.body);
+
   if (!ime || !prezime || !email  || !isRazrednik || !predmet) {
+    console.log(!isRazrednik);
     res.status(400)
     throw new Error('Sva polja su obavezna!');
   }
