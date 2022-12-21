@@ -19,7 +19,7 @@ const registerProfesor = asyncHandler(async (req, res) => {
 
   console.log(req.body);
 
-  if (!ime || !prezime || !email  || !isRazrednik || !predmet) {
+  if (!ime || !prezime || !email  || !("isRazrednik" in req.body) || !predmet) {
     console.log(!isRazrednik);
     res.status(400)
     throw new Error('Sva polja su obavezna!');
@@ -84,7 +84,7 @@ const registerProfesor = asyncHandler(async (req, res) => {
       email: profesor.email,
       predmet: profesor.predmet,
       isRazrednik: profesor.isRazrednik,
-      token: generateToken(profesor._id)
+      // token: generateToken(profesor._id)
     });    
   } catch (error) {
     res.status(400);

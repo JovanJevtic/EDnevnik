@@ -23,18 +23,17 @@ const registerProfesor = async (data: RegisterProfesorData) => {
         headers: {'Authorization': 'Bearer '+ data.adminToken}
       })
     
-      console.log(data);
-    const response = await axiosInstance.post(API_URL, {
+    const response = await axiosInstance.post(API_URL, {    
         ime: data.ime,
         prezime: data.prezime,
         isRazrednik: data.isRazrednik,
         predmet: data.predmet, 
         email: data.email
     });
-    console.log(response);
-    if (response.data.token) { 
-        localStorage.setItem('profesorToken', (response.data.token));
-    }
+    
+    // if (response.data.token) { 
+    //     localStorage.setItem('profesorToken', (response.data.token));
+    // }
 
     return response.data;
 }
