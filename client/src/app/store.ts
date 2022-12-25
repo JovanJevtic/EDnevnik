@@ -2,11 +2,13 @@ import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
 import authAdminReducer from '../features/admin/authAdminSlice';
 import authProfesorReducer from '../features/profesor/authProfesorSlice';
+import authUcenikReducer from '../features/ucenik/authUcenikSlice';
 
 export const store = configureStore({
     reducer: {
         authAdmin: authAdminReducer,
-        authProfesor: authProfesorReducer
+        authProfesor: authProfesorReducer,
+        authUcenik: authUcenikReducer
     }
 });
 

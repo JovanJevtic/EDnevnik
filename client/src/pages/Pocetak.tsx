@@ -40,13 +40,18 @@ const Pocetak: React.FC<PocetakProps> = ({}) => {
                     <RegisterAdminPage />
                 </Route>
                 <Route path='/admin/login'>
-                    <LoginAdminForm />
+                    <LoginAdminPage />
                 </Route>
                 <Route path='/profesor/login'>
                     <LoginProfesorPage />
                 </Route>
                 <Route path='/ucenik/login'>
                     <LoginUcenikPage />
+                </Route>
+                <Route path='/ja/sam'>
+                    <IonPage>
+                        <IonTitle>Ja sam</IonTitle>
+                    </IonPage>
                 </Route>
                 <Route>
                     <Redirect to="/" />

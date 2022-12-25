@@ -1,33 +1,37 @@
 import { InputChangeEventDetail, IonInputCustomEvent } from '@ionic/core';
-import { IonButton, IonInput, IonItem, IonLabel, IonPage, useIonAlert } from '@ionic/react';
+import { IonButton, IonInput, IonItem, useIonAlert } from '@ionic/react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 import { AppDispatch, RootState } from '../../../../app/store';
-import { login, reset } from '../../../../features/admin/authAdminSlice';
+import { register, reset } from '../../../../features/admin/authAdminSlice';
 import '../adminAuthStyles.css';
-interface LoginAdminFormProps {
+interface RegisterAdminForm {
 
 }
 
 interface IFormData {
+    ime: string;
+    adminSifra: string;
     email: string;
     sifra: string;
 }
 
-const LoginAdminForm: React.FC<LoginAdminFormProps> = ({}) => {
+const RegisterAdminForm: React.FC<RegisterAdminForm> = ({}) => {
     const dispatch = useDispatch<AppDispatch>()
     const history = useHistory()
     const [presentAlert] = useIonAlert();
 
     const [formData, setFormData] = useState<IFormData>({
         email: '',
-        sifra: ''
+        sifra: '',
+        adminSifra: '',
+        ime: ''
     });
 
-    const { email, sifra } = formData;
+    const { email, sifra, adminSifra, ime } = formData;
 
     const onChange = (event: IonInputCustomEvent<InputChangeEventDetail>) => {
         setFormData((prevState) => ({
@@ -59,14 +63,14 @@ const LoginAdminForm: React.FC<LoginAdminFormProps> = ({}) => {
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        dispatch(login(formData));
+        dispatch(register(formData));
     }
 
 
     return (
-            <div id='loginForm-container'>
-                <div id="loginForm-svg-container">
-                    <svg id='loginForm-svg' width="900" height="600" viewBox="0 0 900 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div id='registerForm-container'>
+                <div id="registerForm-svg-container">
+                    {/* <svg id='registerForm-svg' width="900" height="600" viewBox="0 0 900 600" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g clip-path="url(#clip0_1_2)">
                         <path d="M614.567 241.256C603.249 248.508 589.795 243.155 570.504 230.336C555.998 220.692 542.66 212.102 531.812 195.598C524.218 184.051 519.953 171.635 517.858 160.668C515.585 148.786 511.286 134.316 520.898 127.347C534.103 117.776 576.37 126.333 602.261 163.037C630.7 203.362 625.633 234.17 614.567 241.256Z" fill="url(#paint0_linear_1_2)"/>
                         <path d="M733.711 277.014C717.202 285.203 695.291 274.673 695.291 274.673C695.291 274.673 700.16 250.871 716.678 242.693C733.187 234.504 755.089 245.022 755.089 245.022C755.089 245.022 750.219 268.825 733.711 277.014V277.014Z" fill="url(#paint1_linear_1_2)"/>
@@ -106,10 +110,20 @@ const LoginAdminForm: React.FC<LoginAdminFormProps> = ({}) => {
                         <rect width="900" height="600" fill="white"/>
                         </clipPath>
                         </defs>
-                    </svg>
+                    </svg> */}
                 </div>
-                <div id="loginForm-form-container">
+                <div id="registerForm-form-container">
                     <form onSubmit={onSubmit}>
+                        <IonItem>
+                            <IonInput 
+                                type='text'
+                                id='ime'
+                                name='ime'
+                                placeholder='Unesi ime'
+                                value={ime}
+                                onIonChange={onChange}
+                            />
+                        </IonItem>
                         <IonItem>
                             {/* <IonLabel>Input email</IonLabel> */}
                             <IonInput 
@@ -132,10 +146,21 @@ const LoginAdminForm: React.FC<LoginAdminFormProps> = ({}) => {
                                 onIonChange={onChange}              
                             />
                         </IonItem>
+
+                        <IonItem>
+                            <IonInput
+                                type='password'
+                                id='adminSifra'
+                                name='adminSifra'
+                                value={adminSifra}
+                                placeholder='Unesi admin lozinku'
+                                onIonChange={onChange}
+                            />
+                        </IonItem>
                         
                         <IonButton expand='block' type='submit'>Submit</IonButton>
                         <IonItem>
-                            <Link to={'/admin/register'}>Register</Link>
+                            <Link to={'/admin/register'}>Login</Link>
                         </IonItem>
                     </form>
                 </div>
@@ -143,4 +168,4 @@ const LoginAdminForm: React.FC<LoginAdminFormProps> = ({}) => {
     );
 }
 
-export default LoginAdminForm
+export default RegisterAdminForm

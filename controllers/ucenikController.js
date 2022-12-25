@@ -23,10 +23,16 @@ const registerUcenik = asyncHandler(async (req, res) => {
   }
 
   //* Check if user is already existing
-  const ucenikPostoji = await Ucenik.findOne({ jbmg: jbmg });
+  const ucenikPostoji = await Ucenik.findOne({ jbmg });
   if (ucenikPostoji) {
     res.status(400);
     throw new Error('Ucenik sa ovim JBMG-om vec postoji');
+  }
+
+  const ucenikEmailPostoji = await Ucenik.findOne({ email });
+  if (ucenikEmailPostoji) {
+    res.status(400);
+    throw new Error('Ucenik sa ovim emailom vec postoji');
   }
 
   //* Generate Password
@@ -79,7 +85,7 @@ const registerUcenik = asyncHandler(async (req, res) => {
     
     res.status(201).json({
       _id: ucenik._id,
-      jbmg: ucenik.email,
+      jbmg: ucenik.jbmg,
       email: ucenik.email,
       ime: ucenik.ime,
       prezime: ucenik.prezime,
@@ -107,15 +113,36 @@ const getUserByJbmg = asyncHandler(async (req, res) => {
   }
 
   res.status(200).json({
-    ime: ucenik.name,
-    prezime: ucenik.email,
+    ime: ucenik.ime,
+    prezime: ucenik.prezime,
     imeRoditelja: ucenik.imeRoditelja,
     datumRodjenja: ucenik.datumRodjenja,
     razredId: ucenik.razredId
   });
 });
 
+const loginUcenik = asyncHandler(async (req, res) => {
+  const { email, sifra } = req.body;
+
+  const ucenik = await Ucenik.findOne({ email });
+
+  if (ucenik && (await bcrypt.compare(sifra, ucenik.sifra))) {
+    res.json({
+      ime: ucenik.ime,
+      prezime: ucenik.prezime,
+      imeRoditelja: ucenik.imeRoditelja,
+      datumRodjenja: ucenik.datumRodjenja,
+      razredId: ucenik.razredId,
+      token: generateToken(ucenik._id)
+    })
+  } else {
+    res.status(400);
+    throw new Error('Nevazeci unos');
+  }
+});
+
 module.exports = {
   registerUcenik,
-  getUserByJbmg
+  getUserByJbmg,
+  loginUcenik
 }

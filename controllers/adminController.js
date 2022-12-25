@@ -85,8 +85,15 @@ const getAdmin = asyncHandler(async (req, res) => {
     res.status(200).json({ ime: profesor.ime, email: profesor.email })
   });
 
+const getMe = asyncHandler(async (req, res) => {
+    if (!req.admin) {
+      res.status(400).json({ message: 'Niste prijavljeni' });
+    }
+    res.status(200).json(req.admin);
+  });
 module.exports = {
     login,
     register,
-    getAdmin
+    getAdmin,
+    getMe
 }

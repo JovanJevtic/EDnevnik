@@ -1,4 +1,3 @@
-import { Redirect, Route } from 'react-router-dom';
 import {
   IonApp,
   IonButton,
@@ -39,7 +38,12 @@ import { useDispatch } from 'react-redux';
 import Pocetak from './pages/Pocetak';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { logout } from './features/admin/authAdminSlice';
+import AdminDashboard from './pages/AdminPages/AdminDashboard';
+import ProfesorDashboard from './pages/ProfesorPages/ProfesorDashboard';
+import UcenikDashbaord from './pages/UcenikPages/UcenikDashbaord';
+import { getMe as getMeAdmin } from './features/admin/authAdminSlice';
+import { getMe as getMeProfesor } from './features/profesor/authProfesorSlice';
+import { getMe as getMeUcenik } from './features/ucenik/authUcenikSlice';
 
 setupIonicReact();
 
@@ -51,7 +55,9 @@ const App: React.FC = () => {
   const [profesorToken, setProfesorToken] = useState<string | null>(null);
   const [ucenikToken, setUcenikToken] = useState<string | null>(null);
 
-  const { admin, isLoading, isError } = useSelector((state: RootState) => state.authAdmin); 
+  const { admin, isLoading: isAdminLoading, isError: isAdminError } = useSelector((state: RootState) => state.authAdmin); 
+  const { profesor, isLoading: isProfesorLoading, isError: isProfesorError } = useSelector((state: RootState) => state.authProfesor);
+  const { ucenik, isLoading: isUcenikLoading, isError: isUcenikError } = useSelector((state: RootState) => state.authUcenik);
 
 
   useEffect(() => {
@@ -59,12 +65,32 @@ const App: React.FC = () => {
     setProfesorToken(localStorage.getItem('profesorToken'));
     setUcenikToken(localStorage.getItem('ucenikToken'));
 
-    console.log(adminToken);
-  }, [admin, isError, isLoading]);
+  }, [admin, isAdminError, isAdminLoading, profesor, isProfesorError, isProfesorLoading, ucenik, isUcenikError, isUcenikLoading ]);
 
-  const adminLogOut = () => { 
-    dispatch(logout())
-  }
+  useEffect(() => {
+    if (adminToken) {
+      dispatch(getMeAdmin(adminToken as string));
+    } 
+    if (profesorToken) {
+      dispatch(getMeProfesor(profesorToken as string))
+    }
+    if (ucenikToken) {
+      dispatch(getMeUcenik(ucenikToken as string))
+    }
+  }, [adminToken, profesorToken, ucenikToken])
+
+  useEffect(() => {
+    if (!admin && isAdminError) {
+      console.log('molim');
+      localStorage.removeItem('adminToken');
+    }
+    if (!isProfesorError && !profesor && isProfesorLoading) {
+      localStorage.removeItem('profesorToken');
+    }
+    if (!isUcenikError && !ucenik && isUcenikLoading) {
+      localStorage.removeItem('ucenikToken');
+    }
+  }, [isAdminError, isUcenikError, isProfesorError, admin, profesor, ucenik])
 
   return (
     <IonApp>
@@ -72,26 +98,19 @@ const App: React.FC = () => {
       {
 
         adminToken ? (
-          <IonPage>
-            <IonTitle>Admin Dashboard</IonTitle>
-            <IonButton onClick={adminLogOut}>Logout</IonButton>
-          </IonPage>
+          <AdminDashboard />
         )
 
         : profesorToken ? 
 
         (
-          <IonPage>
-            <IonTitle>Profesor Dashboard</IonTitle>
-          </IonPage>
+          <ProfesorDashboard />
         ) 
 
         : ucenikToken ? 
 
         (
-          <IonPage>
-            <IonTitle>Ucenik Dashboard</IonTitle>
-          </IonPage>
+          <UcenikDashbaord />
         )
 
         : (
@@ -99,19 +118,6 @@ const App: React.FC = () => {
         )
 
       }
-
-      {/* <IonReactRouter>
-        <Route exact path="/tab1">
-          <Page />
-        </Route>      
-        <Route exact path="/">
-          <Redirect to="/tab1" />
-        </Route>
-        <Route>
-          <Redirect to="/tab1" />
-        </Route>
-        
-      </IonReactRouter> */}
     </IonApp>
   )
 };
