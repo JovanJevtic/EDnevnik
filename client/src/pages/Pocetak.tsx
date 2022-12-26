@@ -20,7 +20,7 @@ const Pocetak: React.FC<PocetakProps> = ({}) => {
                     <IonPage>
                         <IonHeader>
                             <IonToolbar>
-                                <IonTitle>EDnevnik</IonTitle>
+                                <IonTitle style={{ textDecoration: 'none', color: '#2dd36f', fontWeight: 'bold', fontSize: '18px' }}>EDnevnik</IonTitle>
                             </IonToolbar>
                         </IonHeader>
                         <IonContent>
