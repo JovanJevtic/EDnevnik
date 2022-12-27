@@ -8,6 +8,7 @@ import { AppDispatch, RootState } from "../../app/store";
 import Header from "../../components/Header";
 import { IAdmin, logout } from "../../features/admin/authAdminSlice";
 import AdminPredmetiPage from "./AdminPredmetiPage";
+import AdminPredmetPage from "./AdminPredmetPage";
 
 interface AdminDashboardProps {
 
@@ -118,6 +119,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({}) => {
                 <Route exact path='/predmeti'>
                     <AdminPredmetiPage admin={admin as IAdmin} onLogout={onLogout} />
                 </Route>
+                <Route exact path='/predmeti/:ime'>
+                    <AdminPredmetPage admin={admin as IAdmin} onLogout={onLogout} />
+                </Route>    
                 <Route>
                     <Redirect to={'/'}/>
                 </Route>

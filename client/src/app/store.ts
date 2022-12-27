@@ -4,11 +4,14 @@ import authAdminReducer from '../features/admin/authAdminSlice';
 import authProfesorReducer from '../features/profesor/authProfesorSlice';
 import authUcenikReducer from '../features/ucenik/authUcenikSlice';
 
+import predmetReducer from '../features/predmet/predmetSlice';
+
 export const store = configureStore({
     reducer: {
         authAdmin: authAdminReducer,
         authProfesor: authProfesorReducer,
-        authUcenik: authUcenikReducer
+        authUcenik: authUcenikReducer,
+        predmet: predmetReducer
     }
 });
 

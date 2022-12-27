@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const asyncHandler = require('express-async-handler');
 const { protectAdmin } = require('../middlewares/authAdmin');
+const Profesor = require('../models/Profesor');
 
 const Predmet = require('../models/Predmet');
 
@@ -9,7 +10,7 @@ router.get('/:ime', asyncHandler(async (req, res) => {
   const predmet = await Predmet.findOne({ ime: req.params.ime });
 
   if (!predmet) {
-    res.status(404).json({ message: 'Nepostojeci predmet' })
+    res.status(400).json({ message: 'Nepostojeci predmet' })
   }
 
   res.status(200).json({ id: predmet._id, ime: predmet.ime, profesori: predmet.profesori })
@@ -30,8 +31,6 @@ router.post('/', protectAdmin, asyncHandler(async (req, res) => {
   }
 
   try {
-    console.log(ime, profesori);
-
      const predmet = await Predmet.create({
       ime: ime,
       profesori: profesori
@@ -75,6 +74,25 @@ router.put('/:ime', protectAdmin, asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Problem with your input!");
   }
+}));
+
+router.get('/', asyncHandler(async (req, res) => {
+  const predmeti = await Predmet.find();
+
+  res.status(200).json(predmeti);
+}));
+
+router.post('/getProfesorByPredmet', asyncHandler(async (req, res)=> {
+  const { predmetId } = req.body;
+
+  if(!predmetId) {
+    res.status(400);
+    throw new Error("All fields are required!");
+  }
+
+  const profesors = await Profesor.find({ predmet: predmetId });
+
+  res.status(200).json(profesors);
 }));
 
 module.exports = router;
